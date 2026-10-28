@@ -238,6 +238,9 @@
     <string name="lbl_kids">Kids</string>
     <string name="lbl_recent_recordings">Recent recordings</string>
     <string name="lbl_repeat">Repeat</string>
+    <string name="lbl_repeat_off">Repeat off</string>
+    <string name="lbl_repeat_one">Repeat one</string>
+    <string name="lbl_repeat_all">Repeat all</string>
     <string name="lbl_new">New</string>
     <string name="lbl_live">Live</string>
     <string name="lbl_schedule">Schedule</string>

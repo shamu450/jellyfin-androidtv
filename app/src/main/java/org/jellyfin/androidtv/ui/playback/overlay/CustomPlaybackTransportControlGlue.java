@@ -37,6 +37,7 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.PlayPauseAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.PlaybackSpeedAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.PreviousLiveTvChannelAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.RecordAction;
+import org.jellyfin.androidtv.ui.playback.overlay.action.RepeatAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.RewindAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SelectAudioAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SelectQualityAction;
@@ -63,6 +64,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     private PlaybackSpeedAction playbackSpeedAction;
     private ZoomAction zoomAction;
     private ChapterAction chapterAction;
+    private RepeatAction repeatAction;
 
     // TV actions
     private PreviousLiveTvChannelAction previousLiveTvChannelAction;
@@ -114,6 +116,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         selectAudioAction.dismissPopup();
         selectQualityAction.dismissPopup();
         zoomAction.dismissPopup();
+        repeatAction.dismissPopup();
 
         super.onDetachedFromHost();
     }
@@ -204,6 +207,8 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         zoomAction.setLabels(new String[]{context.getString(R.string.lbl_zoom)});
         chapterAction = new ChapterAction(context, this);
         chapterAction.setLabels(new String[]{context.getString(R.string.lbl_chapters)});
+        repeatAction = new RepeatAction(context, this);
+        repeatAction.setLabels(new String[]{context.getString(R.string.lbl_repeat)});
 
         previousLiveTvChannelAction = new PreviousLiveTvChannelAction(context, this);
         previousLiveTvChannelAction.setLabels(new String[]{context.getString(R.string.lbl_prev_item)});
@@ -282,6 +287,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
             secondaryActionsAdapter.add(selectQualityAction);
         }
 
+        secondaryActionsAdapter.add(repeatAction);
         secondaryActionsAdapter.add(zoomAction);
     }
 

@@ -74,6 +74,11 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     protected long mCurrentPosition = 0;
     private PlaybackState mPlaybackState = PlaybackState.IDLE;
 
+    public static final int REPEAT_OFF = 0;
+    public static final int REPEAT_ONE = 1;
+    public static final int REPEAT_ALL = 2;
+    private int mRepeatMode = REPEAT_OFF;
+
     private StreamInfo mCurrentStreamInfo;
 
     private final InteractionTrackerViewModel interactionTracker;
@@ -246,6 +251,15 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
     public boolean hasPreviousItem() {
         return mItems != null && mCurrentIndex - 1 >= 0;
+    }
+
+    public int getRepeatMode() {
+        return mRepeatMode;
+    }
+
+    public void setRepeatMode(int repeatMode) {
+        mRepeatMode = repeatMode;
+        Timber.i("Repeat mode changed to %d", repeatMode);
     }
 
     public boolean isPlaying() {
@@ -1190,8 +1204,26 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         stop();
         resetPlayerErrors();
 
+        if (mRepeatMode == REPEAT_ONE && getCurrentlyPlayingItem() != null) {
+            Timber.i("Repeat one: replaying current item");
+            spinnerOff = false;
+            play(0);
+            return;
+        }
+
         BaseItemDto nextItem = getNextItem();
         BaseItemDto curItem = getCurrentlyPlayingItem();
+
+        // Repeat all keeps the queue order, so a shuffled queue loops in the same shuffled order
+        if (mRepeatMode == REPEAT_ALL && nextItem == null && curItem != null) {
+            Timber.i("Repeat all: looping back to first item");
+            mCurrentIndex = 0;
+            videoQueueManager.getValue().setCurrentMediaPosition(mCurrentIndex);
+            spinnerOff = false;
+            play(0);
+            return;
+        }
+
         if (nextItem == null || curItem == null) {
             endPlayback(true);
             return;
@@ -1200,7 +1232,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         Timber.i("Moving to next queue item. Index: %s", (mCurrentIndex + 1));
         boolean stillWatchingEnabled = userPreferences.getValue().get(UserPreferences.Companion.getStillWatchingBehavior()) != StillWatchingBehavior.DISABLED;
         boolean nextUpEnabled = userPreferences.getValue().get(UserPreferences.Companion.getNextUpBehavior()) != NextUpBehavior.DISABLED;
-        if ((stillWatchingEnabled || nextUpEnabled) && curItem.getType() != BaseItemKind.TRAILER) {
+        if ((stillWatchingEnabled || nextUpEnabled) && curItem.getType() != BaseItemKind.TRAILER && mRepeatMode != REPEAT_ALL) {
             mCurrentIndex++;
             videoQueueManager.getValue().setCurrentMediaPosition(mCurrentIndex);
             spinnerOff = false;
